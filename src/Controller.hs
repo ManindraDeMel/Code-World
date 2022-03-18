@@ -51,8 +51,18 @@ handleEvent event (Model shapes tool colour) =
 
 -- TODO
 nextColour :: ColourName -> ColourName
-nextColour = undefined
+nextColour colour = case colour of 
+  White -> Black 
+  _ -> succ colour
 
 -- TODO
 nextTool :: Tool -> Tool
-nextTool = undefined
+nextTool tool = case tool of
+  LineTool Nothing -> PolygonTool []
+  PolygonTool [] -> CircleTool Nothing
+  CircleTool Nothing -> TriangleTool Nothing
+  TriangleTool Nothing -> RectangleTool 1.0 Nothing
+  RectangleTool _ Nothing -> CapTool Nothing Nothing
+  CapTool Nothing Nothing -> LineTool Nothing
+  _ -> tool
+  

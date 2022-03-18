@@ -26,7 +26,13 @@ modelToPicture (Model ss t c)
 
 -- TODO
 toolToLabel :: Tool -> String
-toolToLabel = undefined
+toolToLabel tool = case tool of 
+  LineTool _ -> "Line: click-drag-release"
+  PolygonTool _ -> "Polygon: click 3 or more times then spacebar"
+  CircleTool _ -> "Circle: click-drag-release between centre and circumference"
+  TriangleTool _ -> "Triangle: click-drag release for first 2 corners"
+  RectangleTool _ _ -> "Rectangle: +/- to increase/decrease scaling factor; click-drag release for first 2 corners"
+  CapTool _ _ -> "Cap: click-drag-release for circle, then click for cap level"
 
 -- TODO
 colourShapesToPicture :: [ColourShape] -> Picture
