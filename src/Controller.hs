@@ -39,9 +39,9 @@ handleEvent event (Model shapes tool colour) =
       where
         k = unpack key
 
-    PointerPress p -> undefined  -- TODO
+    PointerPress _ -> undefined  -- TODO
 
-    PointerRelease p -> undefined  -- TODO
+    PointerRelease _ -> undefined  -- TODO
     
     -- ignore other events
     _ -> currentModel
