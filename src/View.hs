@@ -34,18 +34,34 @@ toolToLabel tool = case tool of
   RectangleTool _ _ -> "Rectangle: +/- to increase/decrease scaling factor; click-drag release for first 2 corners"
   CapTool _ _ -> "Cap: click-drag-release for circle, then click for cap level"
 
--- TODO
+-- 
 colourShapesToPicture :: [ColourShape] -> Picture
-colourShapesToPicture = undefined
+colourShapesToPicture colourshapeList = pictures $ map colourShapeToPicture colourshapeList
 
--- TODO
+-- 
 colourShapeToPicture :: ColourShape -> Picture
-colourShapeToPicture = undefined
+colourShapeToPicture (shape, color) = coloured (colourNameToColour color) (shapeToPicture shape)
 
--- TODO
+-- 
 colourNameToColour :: ColourName -> Colour
-colourNameToColour = undefined
+colourNameToColour colourName = case colourName of
+  Black -> black 
+  Red -> red 
+  Orange -> orange 
+  Yellow -> yellow 
+  Green -> green 
+  Blue -> blue 
+  Purple -> purple 
+  White -> white 
 
 -- TODO
 shapeToPicture :: Shape -> Picture
-shapeToPicture = undefined
+shapeToPicture shape = case shape of 
+  Line a b -> polyline [a, b]
+  Polygon points -> polygon points
+  Circle (a, b) (c, d) -> translated a b $ solidCircle (sqrt(c*c + d*d))
+  Triangle (a, b) (c, d) -> polyline [(a, b), (c, d), ((2 * a) + c, d)]
+  Rectangle scale (a, b) (c, d) -> translated a b $ solidRectangle (abs l) (scale * l) -- need to do
+    where l = abs $ a - c
+  Cap (a, b) (c, d) something -> translated a b $ solidCircle (sqrt(c*c + d*d)) -- need to do
+
