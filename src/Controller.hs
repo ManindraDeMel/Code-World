@@ -24,7 +24,9 @@ handleEvent event (Model shapes tool colour) =
 
       | k == "Backspace" || k == "Delete" -> Model (init shapes) tool colour
 
-      | k == " " -> undefined  -- TODO
+      | k == " " -> case tool of
+        PolygonTool points -> Model (shapes ++ [Polygon points]) (PolygonTool []) colour
+
 
       | k == "T" -> Model shapes (nextTool tool) colour
 
@@ -53,6 +55,7 @@ handleEvent event (Model shapes tool colour) =
 
 
     PointerRelease p ->  case tool of
+      PolygonTool ps -> Model shapes (PolygonTool (ps ++ p)) colour
       LineTool p1        -> Model (shapes ++ [(Line (fromJust p1) p, colour)]) (LineTool Nothing) colour
       CircleTool p1      -> Model (shapes ++ [(Circle (fromJust p1) p, colour)]) (CircleTool Nothing) colour
       TriangleTool p1    -> Model (shapes ++ [(Triangle (fromJust p1) p, colour)]) (TriangleTool Nothing) colour
