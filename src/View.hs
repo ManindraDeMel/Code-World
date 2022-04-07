@@ -87,6 +87,6 @@ shapeToPicture shape = case shape of
                       -- Here we create the dimensions of the rectangle       -- then translate it up to the centre 
       rectangleClip = clipped (2 * radius) (2 * (b - cutoff + radius)) (translated 0 (-radius) $ solidCircle radius)
 
-  GeneralPolygon (a, b) points -> translated a b $ solidPolygon points
+  GeneralPolygon (a, b) points -> translated a b $ solidPolygon points -- translate the polygon back to the centre the user defined
 
 

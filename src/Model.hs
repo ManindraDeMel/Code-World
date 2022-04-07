@@ -20,7 +20,8 @@ data Shape
   -- | For the Cap, the centre and a circumference point of
   --   the defining circle, then the y level of the cap.
   | Cap Point Point Double
-
+  -- | For the GeneralPolygon, 
+  -- the centre and a single vertex point of the polygon (-- 4.4 Extension for COMP1130)
   | GeneralPolygon Point [Point] 
   deriving (Show)
 
@@ -33,7 +34,7 @@ data Tool
   | TriangleTool (Maybe Point)
   | RectangleTool Double (Maybe Point)
   | CapTool (Maybe Point) (Maybe Point)
-  | GeneralPolygonTool Double (Maybe Point)
+  | GeneralPolygonTool Double (Maybe Point) -- 4.4 Extension for COMP1130
   deriving (Eq, Show)
 
 data ColourName
@@ -47,7 +48,7 @@ data ColourName
   | White
   deriving (Eq, Show, Enum)
 
-data Model = Model [ColourShape] Tool ColourName [[ColourShape]]
+data Model = Model [ColourShape] Tool ColourName [[ColourShape]] -- [[colourshape]] is the save list for (4.1 COMP1130 extensions)
   deriving (Show)
 
 -- | Starting Model for when CodeWorld first starts up.
