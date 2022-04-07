@@ -20,6 +20,8 @@ data Shape
   -- | For the Cap, the centre and a circumference point of
   --   the defining circle, then the y level of the cap.
   | Cap Point Point Double
+
+  | GeneralPolygon Point [Point] 
   deriving (Show)
 
 type ColourShape = (Shape, ColourName)
@@ -31,6 +33,7 @@ data Tool
   | TriangleTool (Maybe Point)
   | RectangleTool Double (Maybe Point)
   | CapTool (Maybe Point) (Maybe Point)
+  | GeneralPolygonTool Double (Maybe Point)
   deriving (Eq, Show)
 
 data ColourName
@@ -44,12 +47,12 @@ data ColourName
   | White
   deriving (Eq, Show, Enum)
 
-data Model = Model [ColourShape] Tool ColourName
+data Model = Model [ColourShape] Tool ColourName [[ColourShape]]
   deriving (Show)
 
 -- | Starting Model for when CodeWorld first starts up.
 startModel :: Model
-startModel = Model [] (LineTool Nothing) Black
+startModel = Model [] (LineTool Nothing) Black []
 
 -- | A sample image.
 sample :: [ColourShape]
