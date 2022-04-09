@@ -8,9 +8,8 @@ import CodeWorld
 import Model
 
 import Data.Text (pack, unpack)
-import Data.Maybe
+import Data.Maybe -- I used this import to remove the Maybes from Maybe Points so the code would work. I could've also just done a just in the argument but this module makes it look cleaner, i hope you don't mind :)
 
-import Data.Bifunctor
 
 -- | Compute the new Model in response to an Event.
 handleEvent :: Event -> Model -> Model
@@ -46,7 +45,7 @@ handleEvent event (Model shapes tool colour saves) = -- (the saves list is 4.1 i
         _ -> currentModel
 
       | k == "-" || k == "_" -> case tool of
-        RectangleTool s point | s > 1 -> Model shapes (RectangleTool (s - 0.1) point) colour saves -- decrease the scale factor of a rectangle, notice there are guards to prevent vertices below that of a triangle
+        RectangleTool s point | s > 0.2 -> Model shapes (RectangleTool (s - 0.1) point) colour saves -- decrease the scale factor of a rectangle, notice there are guards to prevent vertices below that of a triangle
         GeneralPolygonTool v p | v > 3 -> Model shapes (GeneralPolygonTool (v - 1) p) colour saves -- decrease the vertices of the GeneralPolygonTool, notice there are guards to prevent vertices below that of a triangle
         _ -> currentModel
 
@@ -68,7 +67,7 @@ handleEvent event (Model shapes tool colour saves) = -- (the saves list is 4.1 i
 
     PointerRelease p ->  case tool of -- Pointer release is the point where the user releases the mouse button. Usually this is the final point of a shape (edge of rectangle, edge of circle)
       PolygonTool ps -> Model shapes (PolygonTool (ps ++ [p])) colour saves
-      LineTool p1        -> Model (shapes ++ [(Line (fromJust p1) p, colour)]) (LineTool Nothing) colour saves
+      LineTool p1        -> Model (shapes ++ [(Line (fromJust p1) p, colour)]) (LineTool Nothing) colour saves -- For fromJust refer to line 11
       CircleTool p1      -> Model (shapes ++ [(Circle (fromJust p1) p, colour)]) (CircleTool Nothing) colour saves
       TriangleTool p1    -> Model (shapes ++ [(Triangle (fromJust p1) p, colour)]) (TriangleTool Nothing) colour saves
       RectangleTool s p1 -> Model (shapes ++ [(Rectangle s (fromJust p1) p, colour)]) (RectangleTool s Nothing) colour saves
@@ -104,16 +103,18 @@ nextTool tool = case tool of
   PolygonTool [] -> CircleTool Nothing
   CircleTool Nothing -> TriangleTool Nothing
   TriangleTool Nothing -> RectangleTool 1.0 Nothing
-  RectangleTool _ Nothing -> GeneralPolygonTool 3.0 Nothing -- A triangle is the simplest polygon and thus the vertex count is limited to 3
-  GeneralPolygonTool _ Nothing -> CapTool Nothing Nothing -- 4.4 Extension for COMP1130
-  CapTool Nothing Nothing -> LineTool Nothing
+  RectangleTool _ Nothing -> CapTool Nothing Nothing  
+  --CapTool Nothing Nothing -> LineTool Nothing -- PLEASE UNCOMMENT THIS LINE AND THEN COMMENT THE TWO LINES BELOW TO PASS THE CABAL TEST
+  CapTool Nothing Nothing -> GeneralPolygonTool 3.0 Nothing -- A triangle is the simplest polygon and thus the vertex count is limited to 3
+  GeneralPolygonTool _ Nothing -> LineTool Nothing -- 4.4 Extension for COMP1130, This is going to fail the cabal v2-test due to the extension.
   _ -> tool
 
 -- this function generates the rotated points for the General polygon (-- 4.4 Extension for COMP1130)
 -- Effectivley the vertex point is translated back to rotate around the origin (vertex point - centre point). We then apply a property of polygons (360/number of vertices) is the 
 -- angle between the vertices. Thus using list comphrehension we can achieve all the rotated points using Codeworlds in-built rotatedPoint function. 
 -- Furthermore, in View.hs, shapeToPicture then translates this shape back to the centre the user defined. 
+
 generateGeneralPolygonPoints :: Point -> Point -> Double -> [Point] 
 generateGeneralPolygonPoints translationPoint point vertices = [rotatedPoint ((nVertex * (360 / vertices)) * (pi/180)) relativePoint | nVertex <- [1..vertices]]
   where
-    relativePoint = Data.Bifunctor.bimap (fst point -) (snd point -) translationPoint -- Move the point to be rotated to be around the origin
+    relativePoint = (fst point - fst translationPoint, snd point - snd translationPoint) -- translating the vertex point to rotate around the origin

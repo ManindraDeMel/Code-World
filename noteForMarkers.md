@@ -1,0 +1,2 @@
+On Controller.hs, the nextTool function will fail the cabal v2-test for shapes because of extension 4.4 which adds a new Tool GeneralPolygon to the program. In order to confirm
+that I have passed the test please uncomment the commented out line in the nextTool function and then also comment the two lines below it. 

@@ -13,13 +13,15 @@ modelToPicture (Model ss t c sl)
   = translated 0 8 toolText
   & translated 0 7 colourText
   & translated 0 (-8) areaText
-  & translated (-18) 0 saveText
-  & translated (-19) (-1) saveText2
+  & translated (-16) 0 saveText
+  & translated (-16) (-1) saveText2 -- the text placement might be differing on different dimension monitors
+  & translated (-16) (-2) saveText3
   & colourShapesToPicture ss
   & coordinatePlane
   where
     saveText = stringToText $ "Saves:" ++ show (length sl)
-    saveText2 = stringToText "(a to save, z to go to previous save)" 
+    saveText2 = stringToText "a: save" 
+    saveText3= stringToText "z: previous save" 
     colourText = stringToText (show c)
     toolText = stringToText (toolToLabel t)
     areaText = stringToText (case t of
@@ -68,23 +70,18 @@ shapeToPicture shape = case shape of
   Line a b -> polyline [a, b]
   Polygon points -> solidPolygon points
   Circle (a, b) (c, d) -> translated a b $ solidCircle (sqrt((a - c)**2 + (b - d)**2))
-  Triangle (a, b) (c, d) -> solidPolygon [(c, d), ((2 * abs(a - c)) + c, d), (a, b)] -- broken
-  Rectangle scale (a, b) (c, d) -> solidPolygon [(a, b), (x3, y3), (c, d), (x4, y4)] -- broken
+  Triangle (a, b) (c, d) -> solidPolygon [(a, b), (2*a - c, d), (c, d)] 
+
+  Rectangle s (a, b) (c, d) -> translated ((a + c) / 2) ((b + d) / 2) $ rotated angle $ solidRectangle rectLength (s * rectLength)
     where
-      xcentre = (a + c) / 2
-      ycentre = (b + d) / 2
-      xhalfd = (a - c) / 2
-      yhalfd = (b - d) / 2
-      x3 = scale * (xcentre - yhalfd)
-      y3 = scale * (ycentre + xhalfd)
-      x4 = scale * (xcentre + yhalfd)
-      y4 = scale * (ycentre - xhalfd)
+      rectLength = sqrt $ (a - c) ** 2 + (b - d) ** 2
+      angle = atan2 (b-d) (a-c)
 
   Cap (a, b) (c, d) cutoff -> translateSemiCircle rectangleClip
     where
       radius = sqrt $ (a - c)**2 + (b - d)**2
       translateSemiCircle = translated a (b + radius) -- here we created move the semi circle to the desired centre
-                      -- Here we create the dimensions of the rectangle       -- then translate it up to the centre 
+                      -- Here we create the dimensions of the rectangle to cut off the circle       -- then translate it up to the centre 
       rectangleClip = clipped (2 * radius) (2 * (b - cutoff + radius)) (translated 0 (-radius) $ solidCircle radius)
 
   GeneralPolygon (a, b) points -> translated a b $ solidPolygon points -- translate the polygon back to the centre the user defined
